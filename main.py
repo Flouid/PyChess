@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from PyQt5.QtGui import QPainter, QPixmap, QColor
 from PyQt5.QtCore import QRect, QPoint
-from piece import Board
+from piece import Move, Board
 
 
 class ChessUI(QWidget):
@@ -22,8 +22,10 @@ class ChessUI(QWidget):
     board = Board()             # the current board state
     pickup = None               # the coordinates to the held piece
     ghosts = Board('empty')     # an empty board for tracking ghosts
-    turn = 'light'              # the current player's turn
-    highlights = Board('empty') # an empty board for tracking places pieces can move to
+    isLightTurn = True          # tracks if it is the light player's turn
+
+    # a variable for tracking all of the possible moves
+    moves = [Move]
 
     def __init__(self):
         # call the parent constructor for a qwidget
@@ -51,8 +53,6 @@ class ChessUI(QWidget):
         self.draw_pieces(painter)
         # draw piece ghosts to the screen
         self.draw_ghosts(painter)
-        # draw highlights to the screen
-        self.draw_highlights(painter)
 
     def mousePressEvent(self, event):
         x = event.pos().x()
@@ -67,20 +67,14 @@ class ChessUI(QWidget):
             # calculate which square the user clicked on
             r, c = self.pixels_to_rowcol(x, y)
 
-            # do nothing if the user clicked on empty space
-            if self.board.board[r, c] is None:
+            # do nothing if the user clicked on empty space or a piece of the wrong color
+            if self.board.board[r, c] is None or self.board.board[r, c].light != self.isLightTurn:
                 return
 
             # mark the current piece as being picked up
             self.pickup = (r, c)
-
             # mark the piece as being held by the user
             self.board.board[r, c].is_active = True
-
-            # print(f'clicked on square ({c}, {r})')
-            # print(f'located at ({x}, {y})')
-            # x1, y1 = self.rowcol_to_pixels(r, c)
-            # print(f'box origin: ({x1}, {y1})')
         
         self.update()
 
@@ -109,6 +103,10 @@ class ChessUI(QWidget):
             self.board.board[r, c] = self.board.board[self.pickup[0], self.pickup[1]]
             # empty the space that the held piece came from
             self.board.board[self.pickup[0], self.pickup[1]] = None
+
+            # add a move to the board and change the color
+            self.board.move += 1
+            self.isLightTurn = not self.isLightTurn
 
         # clear the picked up piece
         self.pickup = None
@@ -175,19 +173,6 @@ class ChessUI(QWidget):
                 if self.ghosts.board[r, c] is not None:
                     x, y = self.rowcol_to_pixels(r, c)
                     painter.drawPixmap(QPoint(x, y), QPixmap(self.ghosts.board[r, c].image))
-
-    def draw_highlights(self, painter):
-        """Draw any highlighted tiles that the player could move to"""
-        # lower the opacity again since highlights should be more subtle
-        painter.setOpacity(0.25)
-
-        # iteratae over every tile
-        for r in range(8):
-            for c in range(8):
-                # if the tile contains a highlight, then draw it to the screen
-                if self.highlights.board[r, c] is not None:
-                    x, y = self.rowcol_to_pixels(r, c)
-                    painter.drawEllipse(x, y, self.box_size, self.box_size)
 
     def pixels_to_rowcol(self, x, y):
         """Gets the row and column values for the indices correlated to the pixel values x and y"""

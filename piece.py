@@ -1,66 +1,71 @@
+from dataclasses import dataclass
 import numpy as np
+
+
+@dataclass
+class Move:
+    """A class for representing a single move as a pair of pairs of coordinates"""
+    begin_r  = None
+    begin_c  = None
+    target_r = None
+    target_c = None
+
 
 class Piece:
     # piece data
     name  = None
     image = None
     role  = None
-    color = None
+    light = False
 
     # state data
     is_active = False
 
-    def __init__(self, name='p'):
+    def __init__(self, name):
         self.name = name
 
         if name == 'r':
             self.image = './chess_icons/dr.png'
             self.role = 'rook'
-            self.color = 'dark'
         elif name == 'n':
             self.image = './chess_icons/dkn.png'
             self.role = 'knight'
-            self.color = 'dark'
         elif name == 'b':
             self.image = './chess_icons/db.png'
             self.role = 'bishop'
-            self.color = 'dark'
         elif name == 'q':
             self.image = './chess_icons/dq.png'
             self.role = 'queen'
-            self.color = 'dark'
         elif name == 'k':
             self.image = './chess_icons/dk.png'
             self.role = 'king'
-            self.color = 'dark'
         elif name == 'p':
             self.image = './chess_icons/dp.png'
             self.role = 'pawn'
-            self.color = 'dark'
         elif name == 'R':
             self.image = './chess_icons/lr.png'
             self.role = 'rook'
-            self.color = 'light'
+            self.light = True
         elif name == 'N':
             self.image = './chess_icons/lkn.png'
             self.role = 'knight'
-            self.color = 'light'
+            self.light = True
         elif name == 'B':
             self.image = './chess_icons/lb.png'
             self.role = 'bishop'
-            self.color = 'light'
+            self.light = True
         elif name == 'Q':
             self.image = './chess_icons/lq.png'
             self.role = 'queen'
-            self.color = 'light'
+            self.light = True
         elif name == 'K':
             self.image = './chess_icons/lk.png'
             self.role = 'king'
-            self.color = 'light'
+            self.light = True
         elif name == 'P':
             self.image = './chess_icons/lp.png'
             self.role = 'pawn'
-            self.color = 'light'
+            self.light = True
 
     def __str__(self):
         return self.name
