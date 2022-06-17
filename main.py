@@ -240,15 +240,22 @@ class ChessUI(QWidget):
             for c in range(8):
                 if self.board.board[r, c] is not None:
                     self.board.board[r, c].en_passant = False
+        # declare a useful alias for the position of the placed piece
+        pos = move.target
         # check for and mark any new instances of en passant
-        if isinstance(self.board.board[move.target.r, move.target.c], Pawn) and abs(move.begin.r - move.target.r) == 2:
-            self.board.board[move.target.r, move.target.c].en_passant = True
+        if isinstance(self.board.board[pos.r, pos.c], Pawn) and abs(pos.r - pos.r) == 2:
+            self.board.board[pos.r, pos.c].en_passant = True
+
+        # if a pawn captured, it can no longer capture with en passant
+        if isinstance(self.board.board[pos.r, pos.c], Pawn):
+            # moving over a column indicates a capture
+            if move.begin.c != pos.c:
+                self.board.board[pos.r, pos.c].can_ep_cap = False
 
         # add a move to the board and change the color
         self.board.move += 1
         self.isLightTurn = not self.isLightTurn        
         
-
     def generate_moves(self):
         """Generates all of the possible moves for the current player. Uses this to populate the moves list"""
         # clear the moves list
@@ -265,51 +272,9 @@ class ChessUI(QWidget):
 
                     # generate pawn moves
                     if isinstance(piece, Pawn):
-                        moves.extend(self.generate_pawn_moves(begin, piece))
+                        moves.extend(piece.generate_moves(self.board, begin, self.isLightTurn))
 
         self.moves = moves
-
-    def generate_pawn_moves(self, begin, piece):
-        """Generates all of the moves possible for the current piece given that it is a pawn"""
-        moves = []
-
-        # pawn move direction is determined by color
-        if piece.isLight:
-            # range is negative for light since it moves up the board
-            max_range = [-1 * n for n in range(1, 2 + (begin.r == 6))]
-        else:
-            # range is positive for dark since it moves down the board
-            max_range = list(range(1, 2 + (begin.r == 1)))
-
-        # iterate down the range of the pawn
-        for n in max_range:
-            # stop the search if the pawn would move off the edge of the board
-            if begin.r + n < 0 or begin.r + n > 7:
-                break
-
-            # calculate potential attacks
-            if abs(n) == 1:
-                # account for the west boundary of the board
-                if begin.c > 0:
-                    west = Position(begin.r + n, begin.c - 1)
-                    if west.contains_enemy_piece(self.board, self.isLightTurn):
-                        moves.append(Move(begin, west))
-                # account for the east boundary of the board
-                if begin.c < 7:
-                    east = Position(begin.r + n, begin.c + 1)
-                    if east.contains_enemy_piece(self.board, self.isLightTurn):
-                        moves.append(Move(begin, east))
-
-            # calculate the position of the landing tile
-            target = Position(begin.r + n, begin.c)
-            # if the current tile does not contain an allied piece, it is a valid move
-            if not target.does_share_color(self.board, self.isLightTurn):
-                moves.append(Move(begin, target))
-            # an allied piece cannot be jumped over, so stop searching
-            else:
-                break
-
-        return moves
 
 def main():
     app = QApplication(sys.argv)

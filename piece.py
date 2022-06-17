@@ -1,5 +1,6 @@
-
 from dataclasses import dataclass
+from position import Position
+from move import Move
 
 
 def create_piece(code):
@@ -62,3 +63,47 @@ class King(Piece):
 class Pawn(Piece):
     en_passant: bool = False
     can_ep_cap: bool = True
+    
+    def generate_moves(self, board, begin, isLight):
+        """Generates all of the moves possible for the current piece given that it is a pawn"""
+        moves = []
+
+        # pawn move direction is determined by color
+        if self.isLight:
+            # range is negative for light since it moves up the board
+            max_range = [-1 * n for n in range(1, 2 + (begin.r == 6))]
+        else:
+            # range is positive for dark since it moves down the board
+            max_range = list(range(1, 2 + (begin.r == 1)))
+
+        # iterate down the range of the pawn
+        for n in max_range:
+            # stop the search if the pawn would move off the edge of the board
+            if begin.r + n < 0 or begin.r + n > 7:
+                break
+
+            # check for en passant
+
+            # calculate potential attacks
+            if abs(n) == 1:
+                # account for the west boundary of the board
+                if begin.c > 0:
+                    west = Position(begin.r + n, begin.c - 1)
+                    if west.contains_enemy_piece(board, isLight):
+                        moves.append(Move(begin, west))
+                # account for the east boundary of the board
+                if begin.c < 7:
+                    east = Position(begin.r + n, begin.c + 1)
+                    if east.contains_enemy_piece(board, isLight):
+                        moves.append(Move(begin, east))
+
+            # calculate the position of the landing tile
+            target = Position(begin.r + n, begin.c)
+            # if the current tile does not contain an allied piece, it is a valid move
+            if not target.does_share_color(board, isLight):
+                moves.append(Move(begin, target))
+            # an allied piece cannot be jumped over, so stop searching
+            else:
+                break
+
+        return moves
