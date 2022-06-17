@@ -1,63 +1,64 @@
 
+from dataclasses import dataclass
 
+
+def create_piece(code):
+    if code == 'r':
+        return Rook(code, './chess_icons/dr.png', False)
+    elif code == 'n':
+        return Knight(code, './chess_icons/dkn.png', False)
+    elif code == 'b':
+        return Bishop(code, './chess_icons/db.png', False)
+    elif code == 'q':
+        return Queen(code, './chess_icons/dq.png', False)
+    elif code == 'k':
+        return King(code, './chess_icons/dk.png', False)
+    elif code == 'p':
+        return Pawn(code, './chess_icons/dp.png', False)
+    elif code == 'R':
+        return Rook(code, './chess_icons/lr.png', True)
+    elif code == 'N':
+        return Knight(code, './chess_icons/lkn.png', True)
+    elif code == 'B':
+        return Bishop(code, './chess_icons/lb.png', True)
+    elif code == 'Q':
+        return Queen(code, './chess_icons/lq.png', True)
+    elif code == 'K':
+        return King(code, './chess_icons/lk.png', True)
+    elif code == 'P':
+        return Pawn(code, './chess_icons/lp.png', True)
+
+
+@dataclass
 class Piece:
     """A class for representing a single piece on the board. 
     Constructor takes a single unique character code for a piece and constructs the piece accordingly"""
     # piece data
-    name: str = None
-    image: str = None
-    role: str = None
-    light: bool = False
-    en_passant: bool = False
-
-    def __init__(self, name):
-        self.name = name
-
-        if name == 'r':
-            self.image = './chess_icons/dr.png'
-            self.role = 'rook'
-        elif name == 'n':
-            self.image = './chess_icons/dkn.png'
-            self.role = 'knight'
-        elif name == 'b':
-            self.image = './chess_icons/db.png'
-            self.role = 'bishop'
-        elif name == 'q':
-            self.image = './chess_icons/dq.png'
-            self.role = 'queen'
-        elif name == 'k':
-            self.image = './chess_icons/dk.png'
-            self.role = 'king'
-        elif name == 'p':
-            self.image = './chess_icons/dp.png'
-            self.role = 'pawn'
-        elif name == 'R':
-            self.image = './chess_icons/lr.png'
-            self.role = 'rook'
-            self.light = True
-        elif name == 'N':
-            self.image = './chess_icons/lkn.png'
-            self.role = 'knight'
-            self.light = True
-        elif name == 'B':
-            self.image = './chess_icons/lb.png'
-            self.role = 'bishop'
-            self.light = True
-        elif name == 'Q':
-            self.image = './chess_icons/lq.png'
-            self.role = 'queen'
-            self.light = True
-        elif name == 'K':
-            self.image = './chess_icons/lk.png'
-            self.role = 'king'
-            self.light = True
-        elif name == 'P':
-            self.image = './chess_icons/lp.png'
-            self.role = 'pawn'
-            self.light = True
+    code: str
+    image: str
+    isLight: bool
 
     def __str__(self):
-        return self.name
+        return self.code
 
     def __repr__(self):
         return self.__str__()
+
+class Rook(Piece):
+    pass
+
+class Knight(Piece):
+    pass
+
+class Bishop(Piece):
+    pass
+
+class Queen(Piece):
+    pass
+
+class King(Piece):
+    pass
+
+class Pawn(Piece):
+    en_passant: bool = False
+    can_ep_cap: bool = True

@@ -1,5 +1,5 @@
 import numpy as np
-from piece import Piece
+from piece import create_piece, Piece
 
 
 class Board:
@@ -41,7 +41,7 @@ class Board:
             if board[i] == 'e':
                 pieces[i // 8, i % 8] = None
             else:
-                pieces[i // 8, i % 8] = Piece(board[i])
+                pieces[i // 8, i % 8] = create_piece(board[i])
 
         return pieces
 

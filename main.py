@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPainter, QPixmap, QColor
 from PyQt5.QtCore import QRect, QPoint
 from position import Position
 from move import Move
+from piece import Rook, Knight, Bishop, Queen, King, Pawn
 from board import Board
 
 
@@ -80,7 +81,7 @@ class ChessUI(QWidget):
             pos = self.pixels_to_rowcol(x, y)
 
             # do nothing if the user clicked on empty space or a piece of the wrong color
-            if self.board.board[pos.r, pos.c] is None or self.board.board[pos.r, pos.c].light != self.isLightTurn:
+            if self.board.board[pos.r, pos.c] is None or self.board.board[pos.r, pos.c].isLight != self.isLightTurn:
                 return
 
             # store the position of the picked up piece
@@ -240,7 +241,7 @@ class ChessUI(QWidget):
                 if self.board.board[r, c] is not None:
                     self.board.board[r, c].en_passant = False
         # check for and mark any new instances of en passant
-        if self.board.board[move.target.r, move.target.c].role == 'pawn' and abs(move.begin.r - move.target.r) == 2:
+        if isinstance(self.board.board[move.target.r, move.target.c], Pawn) and abs(move.begin.r - move.target.r) == 2:
             self.board.board[move.target.r, move.target.c].en_passant = True
 
         # add a move to the board and change the color
@@ -258,12 +259,12 @@ class ChessUI(QWidget):
             for c in range(8):
                 piece = self.board.board[r, c]
                 # only consider pieces that belong to the current player
-                if piece is not None and piece.light == self.isLightTurn:
+                if piece is not None and piece.isLight == self.isLightTurn:
                     # track the position the piece would move from
                     begin = Position(r, c)
 
                     # generate pawn moves
-                    if piece.role == 'pawn':
+                    if isinstance(piece, Pawn):
                         moves.extend(self.generate_pawn_moves(begin, piece))
 
         self.moves = moves
@@ -273,7 +274,7 @@ class ChessUI(QWidget):
         moves = []
 
         # pawn move direction is determined by color
-        if piece.light:
+        if piece.isLight:
             # range is negative for light since it moves up the board
             max_range = [-1 * n for n in range(1, 2 + (begin.r == 6))]
         else:
