@@ -11,9 +11,7 @@ class Board:
     empty_board: str = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
     def __init__(self, board=default_board):
-        if board is None:
-            self.board = self.init_board()
-        elif board == 'empty':
+        if board == 'empty':
             self.board = self.read_board(self.empty_board)
         else:
             self.board = self.read_board(board)
@@ -82,11 +80,3 @@ class Board:
 
     def __repr__(self):
         return self.__str__()
-
-    @staticmethod
-    def init_board():
-        board = np.zeros((8, 8), dtype=str)
-        for r in range(8):
-            for c in range(8):
-                board[r, c] = 'e'
-        return board
