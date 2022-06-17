@@ -48,7 +48,7 @@ class Board:
     def __str__(self):
         """Encode the board state as a string"""
         out = ''
-        # for every place on the board, write it as a single character
+        # for every place on the board, write it to an output string
         for r in range(8):
             for c in range(8):
                 # write an empty space
@@ -61,7 +61,7 @@ class Board:
                         out += '1'
                     else:
                         out += '0'
-                # write a pawn and it's en passant information
+                # write a pawn and its' en passant information
                 elif isinstance(self.board[r, c], Pawn):
                     out += str(self.board[r, c])
                     if self.board[r, c].en_passant:

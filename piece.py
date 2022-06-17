@@ -46,14 +46,39 @@ class Piece:
         return self.__str__()
 
 class Rook(Piece):
-    can_castle = True
+    can_castle: bool
 
     def __init__(self, code, image, isLight, canCaste):
         super(Rook, self).__init__(code, image, isLight)
         self.can_castle = canCaste
 
     def generate_moves(self, board, begin, isLight):
-        return []
+        """Generates all of the moves possible for the current piece given that it is a rook"""
+        moves = []
+
+        # determine the distance to the edge of the board in each direction
+        r_range = range(0 - begin.r, 7 - begin.r)
+        c_range = range(0 - begin.c, 7 - begin.c)
+
+        # find the minimum and maximum of each range
+        min_rval = min(r_range)
+        max_rval = max(r_range)
+        min_cval = min(c_range)
+        max_cval = min(c_range)
+
+        # find the limits of where the rook can travel along the rows
+        dist = 1
+        while True:
+            if min_rval <= dist <= max_rval:
+                if board.board[begin.r, begin.c]
+
+            
+        # find the limits of where the rook can travel along the columns
+        dist = 1
+        while True:
+            break
+
+        return moves
 
 class Knight(Piece):
     def generate_moves(self, board, begin, isLight):
@@ -72,8 +97,8 @@ class King(Piece):
         return []
 
 class Pawn(Piece):
-    en_passant: bool = False
-    can_ep_cap: bool = True
+    en_passant: bool
+    can_ep_cap: bool
 
     def __init__(self, code, image, isLight, ep, can_ep):
         super(Pawn, self).__init__(code, image, isLight)
