@@ -97,20 +97,21 @@ class ChessUI(QWidget):
                 # clear any existing ghosts
                 self.ghosts.board[r, c] = None
 
-        # if the user is holding a piece
-        if self.pickup is not None:
-            # get the pixel position of the dropped piece
-            x, y = event.pos().x(), event.pos().y()
+        # if the user was not holding a piece, do nothing
+        if self.pickup is None:
+            return
 
-            # only drop the piece if the target location is on the board
-            if (self.width_offset < x <= self.width - self.width_offset) and \
-               (self.height_offset < y <= self.height - self.height_offset):
-                pos = self.pixels_to_rowcol(x, y)
+        # get the pixel position of the dropped piece
+        x, y = event.pos().x(), event.pos().y()
 
-                # if the user dropped the piece where they picked it up then do nothing
-                if pos == self.pickup:
-                    return
+        # only drop the piece if the target location is on the board
+        if (self.width_offset < x <= self.width - self.width_offset) and \
+            (self.height_offset < y <= self.height - self.height_offset):
+            # get the coordinates of the drop position
+            pos = self.pixels_to_rowcol(x, y)
 
+            # confirm that the user choose a valid move
+            if self.is_valid_move(Move(self.pickup, pos)):
                 # put the held piece in the dropped position
                 self.board.board[pos.r, pos.c] = self.board.board[self.pickup.r, self.pickup.c]
                 # empty the space that the held piece came from
@@ -197,7 +198,7 @@ class ChessUI(QWidget):
     def draw_targets(self, painter):
         """Draw a distinctive highlight on every tile that the held piece can move to"""
         # lower the opacity since highlights should be subtle
-        painter.setOpacity(0.5)
+        painter.setOpacity(0.25)
 
         # if nothing is currently held, don't draw anything
         if self.pickup is None:
@@ -229,6 +230,9 @@ class ChessUI(QWidget):
         y = r * self.box_size + self.width_offset
         return x, y     
           
+    def is_valid_move(self, move):
+        return move in self.moves
+
     def generate_moves(self):
         """Generates all of the possible moves for the current player. Uses this to populate the moves list"""
         # clear the moves list
