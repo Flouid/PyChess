@@ -252,7 +252,6 @@ class ChessUI(QWidget):
             if begin.c != target.c:
                 self.board.board[target.r, target.c].can_ep_cap = False
 
-
     def execute_move(self, move):
         """Execute a move by mutating the board state and performing any accompanying state changes"""
         # put the held piece in the dropped position

@@ -101,7 +101,7 @@ class Pawn(Piece):
             # calculate the position of the landing tile
             target = Position(begin.r + n, begin.c)
             # if the current tile does not contain an allied piece, it is a valid move
-            if not target.does_share_color(board, isLight):
+            if not target.contains_piece(board):
                 moves.append(Move(begin, target))
             # an allied piece cannot be jumped over, so stop searching
             else:
