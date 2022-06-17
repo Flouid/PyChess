@@ -93,20 +93,24 @@ class ChessUI(QWidget):
         if self.pickup is not None:
             # record the location of the dropped piece
             x, y = event.pos().x(), event.pos().y()
-            r, c = self.pixels_to_rowcol(x, y)
 
-            # if the user dropped the piece where they picked it up then do nothing
-            if self.pickup[0] == r and self.pickup[1] == c:
-                return
+            # only drop the piece if the target location is on the board
+            if (self.width_offset < x <= self.width - self.width_offset) and \
+               (self.height_offset < y <= self.height - self.height_offset):
+                r, c = self.pixels_to_rowcol(x, y)
 
-            # put the held piece in the dropped position
-            self.board.board[r, c] = self.board.board[self.pickup[0], self.pickup[1]]
-            # empty the space that the held piece came from
-            self.board.board[self.pickup[0], self.pickup[1]] = None
+                # if the user dropped the piece where they picked it up then do nothing
+                if self.pickup[0] == r and self.pickup[1] == c:
+                    return
 
-            # add a move to the board and change the color
-            self.board.move += 1
-            self.isLightTurn = not self.isLightTurn
+                # put the held piece in the dropped position
+                self.board.board[r, c] = self.board.board[self.pickup[0], self.pickup[1]]
+                # empty the space that the held piece came from
+                self.board.board[self.pickup[0], self.pickup[1]] = None
+
+                # add a move to the board and change the color
+                self.board.move += 1
+                self.isLightTurn = not self.isLightTurn
 
         # clear the picked up piece
         self.pickup = None
