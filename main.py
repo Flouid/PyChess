@@ -113,8 +113,10 @@ class ChessUI(QWidget):
 
             # confirm that the user choose a valid move and execute it
             move = Move(self.pickup, pos)
-            if self.is_valid_move(move):
-                self.execute_move(move)
+            for m in self.moves:
+                if m == move and self.is_valid_move(m):
+                    self.execute_move(m)
+                    break
 
         # clear the picked up piece
         self.pickup = None
@@ -228,29 +230,38 @@ class ChessUI(QWidget):
     def is_valid_move(self, move):
         return move in self.moves
 
-    def execute_move(self, move):
-        """Execute a move by mutating the board state and performing any accompanying state changes"""
-        # put the held piece in the dropped position
-        self.board.board[move.target.r, move.target.c] = self.board.board[move.begin.r, move.begin.c]
-        # empty the space that the held piece came from
-        self.board.board[move.begin.r, move.begin.c] = None
+    def account_for_pawns(self, move):
+        """Accounts for the intracacies of en passant and other pawn shenanigans"""
+        begin, target = move.begin, move.target
+        # if this is an en-passant capture, then delete the appropriate pawn
+        if move.is_ep_cap:
+            self.board.board[begin.r, target.c] = None
 
         # clear existing en passant
         for r in range(8):
             for c in range(8):
                 if self.board.board[r, c] is not None:
                     self.board.board[r, c].en_passant = False
-        # declare a useful alias for the position of the placed piece
-        pos = move.target
         # check for and mark any new instances of en passant
-        if isinstance(self.board.board[pos.r, pos.c], Pawn) and abs(pos.r - pos.r) == 2:
-            self.board.board[pos.r, pos.c].en_passant = True
+        if isinstance(self.board.board[target.r, target.c], Pawn) and abs(begin.r - target.r) == 2:
+            self.board.board[target.r, target.c].en_passant = True
 
         # if a pawn captured, it can no longer capture with en passant
-        if isinstance(self.board.board[pos.r, pos.c], Pawn):
+        if isinstance(self.board.board[target.r, target.c], Pawn):
             # moving over a column indicates a capture
-            if move.begin.c != pos.c:
-                self.board.board[pos.r, pos.c].can_ep_cap = False
+            if begin.c != target.c:
+                self.board.board[target.r, target.c].can_ep_cap = False
+
+
+    def execute_move(self, move):
+        """Execute a move by mutating the board state and performing any accompanying state changes"""
+        # put the held piece in the dropped position
+        begin, target = move.begin, move.target
+        self.board.board[target.r, target.c] = self.board.board[begin.r, begin.c]
+        # empty the space that the held piece came from
+        self.board.board[begin.r, begin.c] = None
+
+        self.account_for_pawns(move)
 
         # add a move to the board and change the color
         self.board.move += 1

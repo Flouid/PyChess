@@ -76,13 +76,14 @@ class Pawn(Piece):
             # range is positive for dark since it moves down the board
             max_range = list(range(1, 2 + (begin.r == 1)))
 
+        # check for en passant
+        moves.extend(self.check_en_passant(begin, board, isLight))
+
         # iterate down the range of the pawn
         for n in max_range:
             # stop the search if the pawn would move off the edge of the board
             if begin.r + n < 0 or begin.r + n > 7:
                 break
-
-            # check for en passant
 
             # calculate potential attacks
             if abs(n) == 1:
@@ -105,5 +106,33 @@ class Pawn(Piece):
             # an allied piece cannot be jumped over, so stop searching
             else:
                 break
+
+        return moves
+
+    def check_en_passant(self, begin, board, isLight):
+        moves = []
+
+        # calculate the en passant offset
+        if isLight:
+            offset = -1
+        else:
+            offset = 1
+
+        # check for en passant, accounting for boundaries of the board
+        if begin.c > 0:
+            west = Position(begin.r, begin.c - 1)
+            # check if there is a pawn directly next to the current pawn
+            if west.contains_enemy_piece(board, isLight) and isinstance(board.board[west.r, west.c], Pawn):
+                # check if the pawn can be captured with en passant and the current pawn can capture with en passant
+                if self.can_ep_cap and board.board[west.r, west.c].en_passant:
+                    moves.append(Move(begin, Position(west.r + offset, west.c), True))
+        # account for east side of the board
+        if begin.c < 7:
+            east = Position(begin.r, begin.c + 1)
+            # check if there is an enemy pawn directly to the east of the current pawn
+            if east.contains_enemy_piece(board, isLight) and isinstance(board.board[east.r, east.c], Pawn):
+                # check if the pawn can be captured with en-passant
+                if self.can_ep_cap and board.board[east.r, east.c].en_passant:
+                    moves.append(Move(begin, Position(east.r + offset, east.c), True))
 
         return moves
