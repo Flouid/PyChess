@@ -59,7 +59,7 @@ class Board:
         return out + str(self.lkc) + str(self.lqc) + str(self.dkc) + str(self.dqc) + str(self.move)
 
     def __repr__(self):
-        return self.str()
+        return self.__str__()
 
     @staticmethod
     def init_board():

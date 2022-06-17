@@ -12,4 +12,4 @@ class Move:
         return f'{self.begin} -> {self.target}'
 
     def __repr__(self):
-        return self.str()
+        return self.__str__()
