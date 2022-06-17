@@ -73,8 +73,6 @@ class ChessUI(QWidget):
 
             # mark the current piece as being picked up
             self.pickup = (r, c)
-            # mark the piece as being held by the user
-            self.board.board[r, c].is_active = True
         
         self.update()
 
@@ -82,9 +80,6 @@ class ChessUI(QWidget):
         # traverse all of the tiles
         for r in range(8):
             for c in range(8):
-                # if the tile contains a piece, mark it as not held
-                if self.board.board[r, c] is not None:
-                    self.board.board[r, c].is_active = False
                 # if the tile contains a ghost, clear it
                 if self.ghosts.board[r, c] is not None:
                     self.ghosts.board[r, c] = None
@@ -158,8 +153,11 @@ class ChessUI(QWidget):
         """Draw the pieces on the chessboard using the painter"""
         for r in range(8):
             for c in range(8):
-                # only consider pieces that exist and are not being held by the player
-                if self.board.board[r, c] is not None and not self.board.board[r, c].is_active:
+                # only consider pieces that exist
+                if self.board.board[r, c] is not None:
+                    # if a piece is held, don't draw it either
+                    if self.pickup is not None and (self.pickup[0] == r and self.pickup[1] == c):
+                        continue
                     # get the origin for the box the piece is in
                     x, y = self.rowcol_to_pixels(r, c)
                     # draw the image for the piece at the calculated coordinates

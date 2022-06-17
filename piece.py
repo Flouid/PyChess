@@ -18,9 +18,6 @@ class Piece:
     role  = None
     light = False
 
-    # state data
-    is_active = False
-
     def __init__(self, name):
         self.name = name
 
