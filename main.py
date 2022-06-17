@@ -90,8 +90,21 @@ class ChessUI(QWidget):
                 # if the tile contains a ghost, clear it
                 if self.ghosts.board[r, c] is not None:
                     self.ghosts.board[r, c] = None
+
+        if self.pickup is not None:
+            # record the location of the dropped piece
+            x, y = event.pos().x(), event.pos().y()
+            r, c = self.pixels_to_rowcol(x, y)
+
+            if self.pickup[0] == r and self.pickup[1] == c:
+                return
+
+            self.board.board[r, c] = self.board.board[self.pickup[0], self.pickup[1]]
+            self.board.board[self.pickup[0], self.pickup[1]] = None
+
         # clear the picked up piece
         self.pickup = None
+
         self.update()
 
     def mouseMoveEvent(self, event):
@@ -143,8 +156,14 @@ class ChessUI(QWidget):
                     painter.drawPixmap(QPoint(x, y), QPixmap(self.board.board[r, c].image))
 
     def draw_ghosts(self, painter):
+        """Draw any ghosts created by the player dragging a piece using the painter"""
+        # lower the opacity since ghosts shouldn't look like real pieces
+        painter.setOpacity(0.5)
+
+        # iterate over every tile
         for r in range(8):
             for c in range(8):
+                # if the tile contains a ghost, then draw it to the screen
                 if self.ghosts.board[r, c] is not None:
                     x, y = self.rowcol_to_pixels(r, c)
                     painter.drawPixmap(QPoint(x, y), QPixmap(self.ghosts.board[r, c].image))
