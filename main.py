@@ -7,16 +7,16 @@ from piece import Position, Move, Board
 
 class ChessUI(QWidget):
     # sets the default color scheme for the app
-    background_color    = '#cccccc'
-    light_color         = '#a0a0a0'
-    dark_color          = '#353535'
+    background_color = '#cccccc'
+    light_color = '#a0a0a0'
+    dark_color = '#353535'
 
     # size parameters for the app
-    height          = 600
-    width           = 600
-    box_size        = 60
-    height_offset   = (height - box_size * 8) // 2
-    width_offset    = (width - box_size * 8) // 2
+    height = 600
+    width = 600
+    box_size = 60
+    height_offset = (height - box_size * 8) // 2
+    width_offset = (width - box_size * 8) // 2
 
     # tracks game parameters
     board = Board()             # the current board state

@@ -17,7 +17,7 @@ class Position:
 @dataclass
 class Move:
     """A class for representing a single move as a pair of positions"""
-    begin:  Position
+    begin: Position
     target: Position
 
 
@@ -103,11 +103,11 @@ class Board:
         else:
             self.board = self.read_board(board)
 
-            self.lkc    = int(board[64])
-            self.lqc    = int(board[65])
-            self.dkc    = int(board[66])
-            self.dqc    = int(board[67])
-            self.move   = int(board[68:])
+            self.lkc = int(board[64])
+            self.lqc = int(board[65])
+            self.dkc = int(board[66])
+            self.dqc = int(board[67])
+            self.move = int(board[68:])
 
     def read_board(self, board):
         """Read a board encoded as a string"""
@@ -136,7 +136,8 @@ class Board:
         # use four bits for the states of castling in each corner, and store the move number
         return out + str(self.lkc) + str(self.lqc) + str(self.dkc) + str(self.dqc) + str(self.move)
 
-    def init_board(self):
+    @staticmethod
+    def init_board():
         board = np.zeros((8, 8), dtype=str)
         for r in range(8):
             for c in range(8):
