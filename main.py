@@ -13,6 +13,9 @@ class ChessUI(QWidget):
     light_color = '#a0a0a0'
     dark_color = '#353535'
 
+    # load the icon for a targetable tile
+    target_icon: str = './chess_icons/green_circle.png'
+
     # size parameters for the app
     height = 600
     width = 600
@@ -59,6 +62,8 @@ class ChessUI(QWidget):
         self.draw_pieces(painter)
         # draw piece ghosts to the screen
         self.draw_ghosts(painter)
+        # draw target icons to the screen
+        self.draw_targets(painter)
 
     def mousePressEvent(self, event):
         """When the user clicks the mouse, the game checks if the user can pick up a piece and does so"""
@@ -117,6 +122,8 @@ class ChessUI(QWidget):
 
         # clear the picked up piece
         self.pickup = None
+        # generate a new set of moves
+        self.generate_moves()
 
         self.update()
 
@@ -186,6 +193,29 @@ class ChessUI(QWidget):
                 if self.ghosts.board[r, c] is not None:
                     x, y = self.rowcol_to_pixels(r, c)
                     painter.drawPixmap(QPoint(x, y), QPixmap(self.ghosts.board[r, c].image))
+
+    def draw_targets(self, painter):
+        """Draw a distinctive highlight on every tile that the held piece can move to"""
+        # lower the opacity since highlights should be subtle
+        painter.setOpacity(0.5)
+
+        # if nothing is currently held, don't draw anything
+        if self.pickup is None:
+            return
+
+        # iterate over every move that was calculated
+        for move in self.moves:
+            # only consider moves that belong to the held piece
+            if move.begin != self.pickup:
+                continue
+
+            # calculate the pixel coordinates of the target
+            x, y = self.rowcol_to_pixels(move.target.r, move.target.c)
+            # rescale the icon to take up a portion of the tile
+            scaledSize = (self.box_size * 3) // 5
+            scaledPadding = self.box_size // 5
+            # draw the target icon on the potential landing space
+            painter.drawPixmap(QPoint(x + scaledPadding, y + scaledPadding), QPixmap(self.target_icon).scaledToWidth(scaledSize))
 
     def pixels_to_rowcol(self, x, y):
         """Gets the row and column values for the indices correlated to the pixel values x and y"""
