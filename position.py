@@ -11,3 +11,10 @@ class Position:
 
     def __eq__(self, __o):
         return __o.r == self.r and __o.c == self.c
+
+    def __str__(self):
+        return f'({self.r}, {self.c})'
+
+    def does_share_color(self, board, isLight):
+        """Checks if a tile on a given board contains a piece of a given color"""
+        return board.board[self.r, self.c] is not None and board.board[self.r, self.c].light == isLight

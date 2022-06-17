@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from PyQt5.QtGui import QPainter, QPixmap, QColor
 from PyQt5.QtCore import QRect, QPoint
 from position import Position
+from move import Move
 from board import Board
 
 
@@ -26,7 +27,7 @@ class ChessUI(QWidget):
     isLightTurn: bool = True    # tracks if it is the light player's turn
 
     # a variable for tracking all of the possible moves
-    moves: list
+    moves: list = []
 
     def __init__(self):
         # call the parent constructor for a qwidget
@@ -42,6 +43,9 @@ class ChessUI(QWidget):
         # create the background 
         self.pix = QPixmap(self.rect().size())
         self.pix.fill(QColor(self.background_color))
+
+        # generate all of the first possible moves
+        self.generate_moves()
 
     def paintEvent(self, event):
         """Draws each layer of the board one after another every update"""
@@ -195,6 +199,44 @@ class ChessUI(QWidget):
         y = r * self.box_size + self.width_offset
         return x, y     
           
+    def generate_moves(self):
+        """Generates all of the possible moves for the current player. Uses this to populate the moves list"""
+        # clear the moves list
+        moves = []
+
+        # iterate over every tile
+        for r in range(8):
+            for c in range(8):
+                piece = self.board.board[r, c]
+                # only consider pieces that belong to the current player
+                if piece is not None and piece.light == self.isLightTurn:
+                    # track the position the piece would move from
+                    begin = Position(r, c)
+
+                    # generate pawn moves
+                    if piece.role == 'pawn':
+
+                        # pawn move direction is determined by color
+                        if piece.light:
+                            # range is negative for light since it moves up the board
+                            max_range = [-1 * n for n in range(1, 2 + (r == 6))]
+                        else:
+                            # range is positive for dark since it moves down the board
+                            max_range = list(range(1, 2 + (r == 1)))
+
+                        # iterate down the range of the pawn
+                        for n in max_range:
+                            # calculate the position of the landing tile
+                            target = Position(r + n, c)
+                            # if the current tile does not contain an allied piece, it is a valid move
+                            if not target.does_share_color(self.board, self.isLightTurn):
+                                moves.append(Move(begin, target))
+                            # an allied piece cannot be jumped over, so stop searching
+                            else:
+                                break
+
+        self.moves = moves
+
 
 def main():
     app = QApplication(sys.argv)
