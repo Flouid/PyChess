@@ -279,10 +279,8 @@ class ChessUI(QWidget):
                 if piece is not None and piece.isLight == self.isLightTurn:
                     # track the position the piece would move from
                     begin = Position(r, c)
-
-                    # generate pawn moves
-                    if isinstance(piece, Pawn):
-                        moves.extend(piece.generate_moves(self.board, begin, self.isLightTurn))
+                    # generate the moves for the piece and add them to the list of all possible moves
+                    moves.extend(piece.generate_moves(self.board, begin, self.isLightTurn))
 
         self.moves = moves
 

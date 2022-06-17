@@ -46,19 +46,24 @@ class Piece:
         return self.__str__()
 
 class Rook(Piece):
-    pass
+    def generate_moves(self, board, begin, isLight):
+        return []
 
 class Knight(Piece):
-    pass
+    def generate_moves(self, board, begin, isLight):
+        return []
 
 class Bishop(Piece):
-    pass
+    def generate_moves(self, board, begin, isLight):
+        return []
 
 class Queen(Piece):
-    pass
+    def generate_moves(self, board, begin, isLight):
+        return []
 
 class King(Piece):
-    pass
+    def generate_moves(self, board, begin, isLight):
+        return []
 
 class Pawn(Piece):
     en_passant: bool = False
