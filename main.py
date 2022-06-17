@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from PyQt5.QtGui import QPainter, QPixmap, QColor
 from PyQt5.QtCore import QRect, QPoint
-from piece import Position, Move, Board
+from position import Position
+from board import Board
 
 
 class ChessUI(QWidget):
