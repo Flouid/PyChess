@@ -20,12 +20,12 @@ class ChessUI(QWidget):
 
     # tracks game parameters
     board = Board()             # the current board state
-    pickup = None               # the coordinates to the held piece
+    pickup: Position = None     # the coordinates to the held piece
     ghosts = Board('empty')     # an empty board for tracking ghosts
-    isLightTurn = True          # tracks if it is the light player's turn
+    isLightTurn: bool = True    # tracks if it is the light player's turn
 
     # a variable for tracking all of the possible moves
-    moves = [Move]
+    moves: list
 
     def __init__(self):
         # call the parent constructor for a qwidget
@@ -43,6 +43,7 @@ class ChessUI(QWidget):
         self.pix.fill(QColor(self.background_color))
 
     def paintEvent(self, event):
+        """Draws each layer of the board one after another every update"""
         # initialize the painter and draw the background
         painter = QPainter(self)
         painter.drawPixmap(QPoint(), self.pix)
@@ -55,8 +56,9 @@ class ChessUI(QWidget):
         self.draw_ghosts(painter)
 
     def mousePressEvent(self, event):
-        x = event.pos().x()
-        y = event.pos().y()
+        """When the user clicks the mouse, the game checks if the user can pick up a piece and does so"""
+        # get the pixel position of the click
+        x, y = event.pos().x(), event.pos().y()
         
         # if the click is outside the board, do nothing
         if x < self.width_offset or x > self.width - self.width_offset:
@@ -77,16 +79,17 @@ class ChessUI(QWidget):
         self.update()
 
     def mouseReleaseEvent(self, event):
+        """When the user releases the mouse, the game clears any existing ghosts,
+        drops any held pieces, and makes a move if possible"""
         # traverse all of the tiles
         for r in range(8):
             for c in range(8):
-                # if the tile contains a ghost, clear it
-                if self.ghosts.board[r, c] is not None:
-                    self.ghosts.board[r, c] = None
+                # clear any existing ghosts
+                self.ghosts.board[r, c] = None
 
         # if the user is holding a piece
         if self.pickup is not None:
-            # record the location of the dropped piece
+            # get the pixel position of the dropped piece
             x, y = event.pos().x(), event.pos().y()
 
             # only drop the piece if the target location is on the board
@@ -113,10 +116,13 @@ class ChessUI(QWidget):
         self.update()
 
     def mouseMoveEvent(self, event):
+        """When the user moves the mouse, checks if they are holding a piece.
+        If so, place a ghost on the tile that the player is mousing over."""
         if self.pickup is not None:
             # reset all of the ghosts
             self.ghosts = Board('empty')
 
+            # get the pixel position of the click
             x, y = event.pos().x(), event.pos().y()
 
             # don't do anything if mousing outside the board
@@ -125,7 +131,7 @@ class ChessUI(QWidget):
             if y < self.height_offset or y > self.height - self.height_offset:
                 return
 
-            # calculate the origin of the current tile
+            # calculate the coordinates of the current tile
             pos = self.pixels_to_rowcol(x, y)
             # mark the current tile with a ghost of the held piece
             self.ghosts.board[pos.r, pos.c] = self.board.board[self.pickup.r, self.pickup.c]
