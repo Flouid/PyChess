@@ -263,6 +263,9 @@ class ChessUI(QWidget):
 
         # iterate down the range of the pawn
         for n in max_range:
+            # stop the search if the pawn would move off the edge of the board
+            if begin.r + n < 0 or begin.r + n > 7:
+                break
 
             # calculate potential attacks
             if abs(n) == 1:
