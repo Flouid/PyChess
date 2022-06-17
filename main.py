@@ -110,16 +110,10 @@ class ChessUI(QWidget):
             # get the coordinates of the drop position
             pos = self.pixels_to_rowcol(x, y)
 
-            # confirm that the user choose a valid move
-            if self.is_valid_move(Move(self.pickup, pos)):
-                # put the held piece in the dropped position
-                self.board.board[pos.r, pos.c] = self.board.board[self.pickup.r, self.pickup.c]
-                # empty the space that the held piece came from
-                self.board.board[self.pickup.r, self.pickup.c] = None
-
-                # add a move to the board and change the color
-                self.board.move += 1
-                self.isLightTurn = not self.isLightTurn
+            # confirm that the user choose a valid move and execute it
+            move = Move(self.pickup, pos)
+            if self.is_valid_move(move):
+                self.execute_move(move)
 
         # clear the picked up piece
         self.pickup = None
@@ -232,6 +226,27 @@ class ChessUI(QWidget):
           
     def is_valid_move(self, move):
         return move in self.moves
+
+    def execute_move(self, move):
+        """Execute a move by mutating the board state and performing any accompanying state changes"""
+        # put the held piece in the dropped position
+        self.board.board[move.target.r, move.target.c] = self.board.board[move.begin.r, move.begin.c]
+        # empty the space that the held piece came from
+        self.board.board[move.begin.r, move.begin.c] = None
+
+        # clear existing en passant
+        for r in range(8):
+            for c in range(8):
+                if self.board.board[r, c] is not None:
+                    self.board.board[r, c].en_passant = False
+        # check for and mark any new instances of en passant
+        if self.board.board[move.target.r, move.target.c].role == 'pawn' and abs(move.begin.r - move.target.r) == 2:
+            self.board.board[move.target.r, move.target.c].en_passant = True
+
+        # add a move to the board and change the color
+        self.board.move += 1
+        self.isLightTurn = not self.isLightTurn        
+        
 
     def generate_moves(self):
         """Generates all of the possible moves for the current player. Uses this to populate the moves list"""

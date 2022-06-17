@@ -8,6 +8,7 @@ class Piece:
     image: str = None
     role: str = None
     light: bool = False
+    en_passant: bool = False
 
     def __init__(self, name):
         self.name = name
