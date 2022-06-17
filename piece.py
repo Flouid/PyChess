@@ -46,6 +46,8 @@ class Piece:
         return self.__str__()
 
 class Rook(Piece):
+    can_castle = True
+
     def generate_moves(self, board, begin, isLight):
         return []
 

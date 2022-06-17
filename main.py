@@ -262,8 +262,7 @@ class ChessUI(QWidget):
 
         self.account_for_pawns(move)
 
-        # add a move to the board and change the color
-        self.board.move += 1
+        # change the active player color
         self.isLightTurn = not self.isLightTurn        
         
     def generate_moves(self):
@@ -277,10 +276,8 @@ class ChessUI(QWidget):
                 piece = self.board.board[r, c]
                 # only consider pieces that belong to the current player
                 if piece is not None and piece.isLight == self.isLightTurn:
-                    # track the position the piece would move from
-                    begin = Position(r, c)
                     # generate the moves for the piece and add them to the list of all possible moves
-                    moves.extend(piece.generate_moves(self.board, begin, self.isLightTurn))
+                    moves.extend(piece.generate_moves(self.board, Position(r, c), self.isLightTurn))
 
         self.moves = moves
 

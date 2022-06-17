@@ -7,15 +7,8 @@ class Board:
     unique string encodings. Stores a board as a 2D numpy array of pieces."""
 
     # string encodings
-    default_board: str = 'rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR11110'
-    empty_board: str = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee11110'
-
-    # state data
-    lkc: int = 1
-    lqc: int = 1
-    dkc: int = 1
-    dqc: int = 1
-    move: int = 0
+    default_board: str = 'rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR'
+    empty_board: str = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
     def __init__(self, board=default_board):
         if board is None:
@@ -24,12 +17,6 @@ class Board:
             self.board = self.read_board(self.empty_board)
         else:
             self.board = self.read_board(board)
-
-            self.lkc = int(board[64])
-            self.lqc = int(board[65])
-            self.dkc = int(board[66])
-            self.dqc = int(board[67])
-            self.move = int(board[68:])
 
     def read_board(self, board):
         """Read a board encoded as a string"""
@@ -56,7 +43,7 @@ class Board:
                 else:
                     out += str(self.board[r, c])
         # use four bits for the states of castling in each corner, and store the move number
-        return out + str(self.lkc) + str(self.lqc) + str(self.dkc) + str(self.dqc) + str(self.move)
+        return out
 
     def __repr__(self):
         return self.__str__()
