@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from PyQt5.QtGui import QPainter, QPixmap, QColor
 from PyQt5.QtCore import QRect, QPoint
-from piece import Move, Board
+from piece import Position, Move, Board
 
 
 class ChessUI(QWidget):
@@ -11,7 +11,7 @@ class ChessUI(QWidget):
     light_color         = '#a0a0a0'
     dark_color          = '#353535'
 
-    # size paramters for the app
+    # size parameters for the app
     height          = 600
     width           = 600
     box_size        = 60
@@ -65,14 +65,14 @@ class ChessUI(QWidget):
             return
         else:
             # calculate which square the user clicked on
-            r, c = self.pixels_to_rowcol(x, y)
+            pos = self.pixels_to_rowcol(x, y)
 
             # do nothing if the user clicked on empty space or a piece of the wrong color
-            if self.board.board[r, c] is None or self.board.board[r, c].light != self.isLightTurn:
+            if self.board.board[pos.r, pos.c] is None or self.board.board[pos.r, pos.c].light != self.isLightTurn:
                 return
 
-            # mark the current piece as being picked up
-            self.pickup = (r, c)
+            # store the position of the picked up piece
+            self.pickup = pos
         
         self.update()
 
@@ -92,16 +92,16 @@ class ChessUI(QWidget):
             # only drop the piece if the target location is on the board
             if (self.width_offset < x <= self.width - self.width_offset) and \
                (self.height_offset < y <= self.height - self.height_offset):
-                r, c = self.pixels_to_rowcol(x, y)
+                pos = self.pixels_to_rowcol(x, y)
 
                 # if the user dropped the piece where they picked it up then do nothing
-                if self.pickup[0] == r and self.pickup[1] == c:
+                if pos == self.pickup:
                     return
 
                 # put the held piece in the dropped position
-                self.board.board[r, c] = self.board.board[self.pickup[0], self.pickup[1]]
+                self.board.board[pos.r, pos.c] = self.board.board[self.pickup.r, self.pickup.c]
                 # empty the space that the held piece came from
-                self.board.board[self.pickup[0], self.pickup[1]] = None
+                self.board.board[self.pickup.r, self.pickup.c] = None
 
                 # add a move to the board and change the color
                 self.board.move += 1
@@ -126,9 +126,9 @@ class ChessUI(QWidget):
                 return
 
             # calculate the origin of the current tile
-            r, c = self.pixels_to_rowcol(x, y)
+            pos = self.pixels_to_rowcol(x, y)
             # mark the current tile with a ghost of the held piece
-            self.ghosts.board[r, c] = self.board.board[self.pickup[0], self.pickup[1]]
+            self.ghosts.board[pos.r, pos.c] = self.board.board[self.pickup.r, self.pickup.c]
 
             # update the render to show the piece
             self.update()
@@ -156,7 +156,7 @@ class ChessUI(QWidget):
                 # only consider pieces that exist
                 if self.board.board[r, c] is not None:
                     # if a piece is held, don't draw it either
-                    if self.pickup is not None and (self.pickup[0] == r and self.pickup[1] == c):
+                    if self.pickup is not None and self.pickup == Position(r, c):
                         continue
                     # get the origin for the box the piece is in
                     x, y = self.rowcol_to_pixels(r, c)
@@ -180,7 +180,7 @@ class ChessUI(QWidget):
         """Gets the row and column values for the indices correlated to the pixel values x and y"""
         c = (x - self.width_offset) // self.box_size
         r = (y - self.height_offset) // self.box_size
-        return r, c
+        return Position(r, c)
 
     def rowcol_to_pixels(self, r, c):
         """Gets the pixel values of the origin on the box that a set of row-column indices points to"""

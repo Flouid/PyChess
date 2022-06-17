@@ -3,20 +3,32 @@ import numpy as np
 
 
 @dataclass
+class Position:
+    """A class for representing a single position as a set of coordinates.
+    Coordinates are encoded (r, c) where r is the row and c is the column, 
+    with the origin being in the top left"""
+    r: int
+    c: int
+
+    def __eq__(self, __o):
+        return __o.r == self.r and __o.c == self.c
+
+
+@dataclass
 class Move:
-    """A class for representing a single move as a pair of pairs of coordinates"""
-    begin_r  = None
-    begin_c  = None
-    target_r = None
-    target_c = None
+    """A class for representing a single move as a pair of positions"""
+    begin:  Position
+    target: Position
 
 
 class Piece:
+    """A class for representing a single piece on the board. 
+    Constructor takes a single unique character code for a piece and constructs the piece accordingly"""
     # piece data
-    name  = None
-    image = None
-    role  = None
-    light = False
+    name: str = None
+    image: str = None
+    role: str = None
+    light: bool = False
 
     def __init__(self, name):
         self.name = name
@@ -69,14 +81,19 @@ class Piece:
 
 
 class Board:
-    default_board = 'rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR11110'
-    empty_board   = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee11110'
+    """A class for representing an entire board state. Constructed from and capable of constructing
+    unique string encodings. Stores a board as a 2D numpy array of pieces."""
 
-    lkc   = 1
-    lqc   = 1
-    dkc   = 1
-    dqc   = 1
-    move  = 0
+    # string encodings
+    default_board: str = 'rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR11110'
+    empty_board: str = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee11110'
+
+    # state data
+    lkc: int = 1
+    lqc: int = 1
+    dkc: int = 1
+    dqc: int = 1
+    move: int = 0
 
     def __init__(self, board=default_board):
         if board is None:
