@@ -15,6 +15,9 @@ class Position:
     def __str__(self):
         return f'({self.r}, {self.c})'
 
+    def __repr__(self):
+        return self.str()
+
     def contains_enemy_piece(self, board, isLight):
         """Checks if a tile on a given board contains an enemy piece to a given color"""
         return board.board[self.r, self.c] is not None and board.board[self.r, self.c].light != isLight

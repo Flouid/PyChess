@@ -10,3 +10,6 @@ class Move:
 
     def __str__(self):
         return f'{self.begin} -> {self.target}'
+
+    def __repr__(self):
+        return self.str()

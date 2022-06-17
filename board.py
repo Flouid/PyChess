@@ -58,6 +58,9 @@ class Board:
         # use four bits for the states of castling in each corner, and store the move number
         return out + str(self.lkc) + str(self.lqc) + str(self.dkc) + str(self.dqc) + str(self.move)
 
+    def __repr__(self):
+        return self.str()
+
     @staticmethod
     def init_board():
         board = np.zeros((8, 8), dtype=str)
