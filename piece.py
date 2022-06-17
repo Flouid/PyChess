@@ -3,9 +3,9 @@ from position import Position
 from move import Move
 
 
-def create_piece(code):
+def create_piece(code, ep=None, can_ep=None, can_castle=None):
     if code == 'r':
-        return Rook(code, './chess_icons/dr.png', False)
+        return Rook(code, './chess_icons/dr.png', False, can_castle)
     elif code == 'n':
         return Knight(code, './chess_icons/dkn.png', False)
     elif code == 'b':
@@ -15,9 +15,9 @@ def create_piece(code):
     elif code == 'k':
         return King(code, './chess_icons/dk.png', False)
     elif code == 'p':
-        return Pawn(code, './chess_icons/dp.png', False)
+        return Pawn(code, './chess_icons/dp.png', False, ep, can_ep)
     elif code == 'R':
-        return Rook(code, './chess_icons/lr.png', True)
+        return Rook(code, './chess_icons/lr.png', True, can_castle)
     elif code == 'N':
         return Knight(code, './chess_icons/lkn.png', True)
     elif code == 'B':
@@ -27,7 +27,7 @@ def create_piece(code):
     elif code == 'K':
         return King(code, './chess_icons/lk.png', True)
     elif code == 'P':
-        return Pawn(code, './chess_icons/lp.png', True)
+        return Pawn(code, './chess_icons/lp.png', True, ep, can_ep)
 
 
 @dataclass
@@ -47,6 +47,10 @@ class Piece:
 
 class Rook(Piece):
     can_castle = True
+
+    def __init__(self, code, image, isLight, canCaste):
+        super(Rook, self).__init__(code, image, isLight)
+        self.can_castle = canCaste
 
     def generate_moves(self, board, begin, isLight):
         return []
@@ -70,6 +74,11 @@ class King(Piece):
 class Pawn(Piece):
     en_passant: bool = False
     can_ep_cap: bool = True
+
+    def __init__(self, code, image, isLight, ep, can_ep):
+        super(Pawn, self).__init__(code, image, isLight)
+        self.en_passant = ep
+        self.can_ep_cap = can_ep
     
     def generate_moves(self, board, begin, isLight):
         """Generates all of the moves possible for the current piece given that it is a pawn"""

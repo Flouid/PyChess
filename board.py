@@ -1,5 +1,5 @@
 import numpy as np
-from piece import create_piece, Piece
+from piece import create_piece, Piece, Rook, Pawn
 
 
 class Board:
@@ -7,7 +7,7 @@ class Board:
     unique string encodings. Stores a board as a 2D numpy array of pieces."""
 
     # string encodings
-    default_board: str = 'rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR'
+    default_board: str = 'r1nbqkbnr1p01p01p01p01p01p01p01p01eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeP01P01P01P01P01P01P01P01R1NBQKBNR1'
     empty_board: str = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
     def __init__(self, board=default_board):
@@ -23,13 +23,28 @@ class Board:
         # create an empty board of type piece
         pieces = np.zeros((8, 8), dtype=Piece)
 
-        # for each character in the board range of the encoding, map 'e' to none and everything else to a piece
-        for i in range(64):
-            if board[i] == 'e':
-                pieces[i // 8, i % 8] = None
+        pieces_idx = 0
+        board_idx = 0
+        while True:
+            curr = board[board_idx]
+            if curr == 'r' or curr == 'R':
+                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(curr, \
+                                                          can_castle=(board[board_idx+1] == '1'))
+                pieces_idx += 1
+                board_idx += 2
+            elif board[board_idx] == 'p' or board[board_idx] == 'P':
+                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(curr, \
+                                                          ep=(board[board_idx+1] == '1'),  \
+                                                          can_ep=(board[board_idx + 2] == '1'))
+                pieces_idx += 1
+                board_idx += 3
             else:
-                pieces[i // 8, i % 8] = create_piece(board[i])
-
+                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(curr)
+                pieces_idx += 1
+                board_idx += 1
+            if pieces_idx == 64:
+                break
+    
         return pieces
 
     def __str__(self):
@@ -38,10 +53,30 @@ class Board:
         # for every place on the board, write it as a single character
         for r in range(8):
             for c in range(8):
+                # write an empty space
                 if self.board[r, c] is None:
                     out += 'e'
-                else:
+                # write a rook and whether or not it can castle
+                elif isinstance(self.board[r, c], Rook):
                     out += str(self.board[r, c])
+                    if self.board[r, c].can_castle:
+                        out += '1'
+                    else:
+                        out += '0'
+                # write a pawn and it's en passant information
+                elif isinstance(self.board[r, c], Pawn):
+                    out += str(self.board[r, c])
+                    if self.board[r, c].en_passant:
+                        out += '1'
+                    else:
+                        out += '0'
+                    if self.board[r, c].can_ep_cap:
+                        out += '1'
+                    else:
+                        out += '0'
+                # write any other piece
+                else:
+                    out += (str(self.board[r, c]))
         # use four bits for the states of castling in each corner, and store the move number
         return out
 
