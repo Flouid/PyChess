@@ -11,6 +11,7 @@ class Piece:
 
     def __init__(self, name):
         self.name = name
+
         if name == 'r':
             self.image = './chess_icons/dr.png'
             self.role = 'rook'
@@ -54,6 +55,7 @@ class Piece:
 
 class Board:
     default_board = 'rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR11110'
+    empty_board   = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee11110'
 
     lkc   = 1
     lqc   = 1
@@ -64,6 +66,8 @@ class Board:
     def __init__(self, board=default_board):
         if board is None:
             self.board = self.init_board()
+        elif board == 'empty':
+            self.board = self.read_board(self.empty_board)
         else:
             self.board = self.read_board(board)
 
