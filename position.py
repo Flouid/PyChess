@@ -23,9 +23,9 @@ class Position:
         return board.board[self.r, self.c] is not None
 
     def contains_enemy_piece(self, board, isLight):
-        """Checks if a tile on a given board contains an enemy piece to a given color"""
+        """Checks if a tile on a given board contains an enemy piece"""
         return board.board[self.r, self.c] is not None and board.board[self.r, self.c].isLight != isLight
 
-    def does_share_color(self, board, isLight):
-        """Checks if a tile on a given board contains a piece of a given color"""
+    def contains_allied_piece(self, board, isLight):
+        """Checks if a tile on a given board contains an allied piece"""
         return board.board[self.r, self.c] is not None and board.board[self.r, self.c].isLight == isLight

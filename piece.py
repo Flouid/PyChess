@@ -69,8 +69,7 @@ class Rook(Piece):
         # find the limits of where the rook can travel along the rows
         dist = 1
         while True:
-            if min_rval <= dist <= max_rval:
-                if board.board[begin.r, begin.c]
+            break
 
             
         # find the limits of where the rook can travel along the columns
