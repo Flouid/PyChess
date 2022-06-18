@@ -24,20 +24,19 @@ class Board:
         pieces_idx = 0
         board_idx = 0
         while True:
-            curr = board[board_idx]
-            if curr == 'r' or curr == 'R':
-                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(curr, \
+            if board[board_idx] == 'r' or board[board_idx] == 'R':
+                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(board[board_idx], \
                                                           can_castle=(board[board_idx+1] == '1'))
                 pieces_idx += 1
                 board_idx += 2
             elif board[board_idx] == 'p' or board[board_idx] == 'P':
-                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(curr, \
+                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(board[board_idx], \
                                                           ep=(board[board_idx+1] == '1'),  \
                                                           can_ep=(board[board_idx + 2] == '1'))
                 pieces_idx += 1
                 board_idx += 3
             else:
-                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(curr)
+                pieces[pieces_idx // 8, pieces_idx % 8] = create_piece(board[board_idx])
                 pieces_idx += 1
                 board_idx += 1
             if pieces_idx == 64:
