@@ -12,6 +12,9 @@ class Position:
     def __eq__(self, __o):
         return __o.r == self.r and __o.c == self.c
 
+    def __add__(self, __o):
+        return self(self.r + __o.r, self.c + __o.c)
+
     def __str__(self):
         return f'({self.r}, {self.c})'
 

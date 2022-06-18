@@ -55,28 +55,54 @@ class Rook(Piece):
     def generate_moves(self, board, pos, isLight):
         """Generates all of the moves possible for the current piece given that it is a rook"""
         moves = []
+        unblocked_directions = {'N': True, 'E': True, 'S': True, 'W': True}
 
-        # find the limits of where the rook can travel along the rows
-        dist = 1
-        while True:
-            if dist <= min_rval:
-                pass
+        def march(direction):
+            # if the tile is empty, add a move
+            if board.board[target.r, target.c] is None:
+                moves.append(Move(pos, target))
+            # if the tile contains an enemy piece, add a move and mark the direction as blocked
+            elif target.contains_enemy_piece(board, isLight):
+                moves.append(Move(pos, target))
+                unblocked_directions[direction] = False
+            # if the tile contains an allied piece, mark the direction as blocked
+            elif target.contains_allied_piece(board, isLight):
+                unblocked_directions[direction] = False
 
-            if dist <= min_cval:
-                pass
+        # try to march up to 7 tiles in each direction
+        for d in range(1, 8):
+            # march to the north
+            if pos.r - d >= 0 and unblocked_directions['N']:
+                target = Position(pos.r - d, pos.c)
+                march('N')
+            # march to the east
+            if pos.c + d < 8 and unblocked_directions['E']:
+                target = Position(pos.r, pos.c + d)
+                march('E')
+            # march to the south
+            if pos.r + d < 8 and unblocked_directions['S']:
+                target = Position(pos.r + d, pos.c)
+                march('S')
+            # march to the west
+            if pos.c - d >= 0 and unblocked_directions['W']:
+                target = Position(pos.r, pos.c - d)
+                march('W')
 
-            break
-            
-        # find the limits of where the rook can travel along the columns
-        dist = 1
-        while True:
-            break
+        print(moves)
 
         return moves
 
 class Knight(Piece):
     def generate_moves(self, board, pos, isLight):
-        return []
+        """Generates all of the moves possible for the current piece given that it is a rook"""
+        moves = []
+
+        def lance(target):
+            # if the target tile is empty or contains an enemy piece then it is a valid move
+            if board.board[target.r, target.c] is None or board.board[target.r, target.c].isLight != isLight:
+                moves.append(Move(pos, target))
+
+        return moves
 
 class Bishop(Piece):
     def generate_moves(self, board, pos, isLight):
