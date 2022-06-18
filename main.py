@@ -230,29 +230,6 @@ class ChessUI(QWidget):
     def is_valid_move(self, move):
         return move in self.moves
 
-    def account_for_pawns(self, move):
-        """Accounts for the intracacies of en passant and other pawn shenanigans.
-        Mutates the state data of the pieces involved in the move and deals with en passant"""
-        begin, target = move.begin, move.target
-        # if this is an en-passant capture, then delete the appropriate pawn
-        if move.is_ep_cap:
-            self.board.board[begin.r, target.c] = None
-
-        # clear existing en passant
-        for r in range(8):
-            for c in range(8):
-                if self.board.board[r, c] is not None:
-                    self.board.board[r, c].en_passant = False
-        # check for and mark any new instances of en passant
-        if isinstance(self.board.board[target.r, target.c], Pawn) and abs(begin.r - target.r) == 2:
-            self.board.board[target.r, target.c].en_passant = True
-
-        # if a pawn captured, it can no longer capture with en passant
-        if isinstance(self.board.board[target.r, target.c], Pawn):
-            # moving over a column indicates a capture
-            if begin.c != target.c:
-                self.board.board[target.r, target.c].can_ep_cap = False
-
     def execute_move(self, move):
         """Execute a move by mutating the board state and performing any accompanying state changes"""
         # put the held piece in the dropped position
@@ -261,7 +238,30 @@ class ChessUI(QWidget):
         # empty the space that the held piece came from
         self.board.board[begin.r, begin.c] = None
 
-        self.account_for_pawns(move)
+        def account_for_pawns(self, move):
+            """Accounts for the intracacies of en passant and other pawn shenanigans.
+            Mutates the state data of the pieces involved in the move and deals with en passant"""
+            begin, target = move.begin, move.target
+            # if this is an en-passant capture, then delete the appropriate pawn
+            if move.is_ep_cap:
+                self.board.board[begin.r, target.c] = None
+
+            # clear existing en passant
+            for r in range(8):
+                for c in range(8):
+                    if self.board.board[r, c] is not None:
+                        self.board.board[r, c].en_passant = False
+            # check for and mark any new instances of en passant
+            if isinstance(self.board.board[target.r, target.c], Pawn) and abs(begin.r - target.r) == 2:
+                self.board.board[target.r, target.c].en_passant = True
+
+            # if a pawn captured, it can no longer capture with en passant
+            if isinstance(self.board.board[target.r, target.c], Pawn):
+                # moving over a column indicates a capture
+                if begin.c != target.c:
+                    self.board.board[target.r, target.c].can_ep_cap = False
+
+        account_for_pawns(move)
 
         # change the active player color
         self.isLightTurn = not self.isLightTurn        

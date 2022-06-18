@@ -107,6 +107,7 @@ class Rook(Piece):
 
         return moves
 
+
 class Knight(Piece):
     def generate_moves(self, board, pos, isLight):
         """Generates all of the moves possible for the current piece given that it is a rook"""
@@ -124,6 +125,7 @@ class Knight(Piece):
                 moves.append(move)
 
         return moves
+
 
 class Bishop(Piece):
     def generate_moves(self, board, pos, isLight):
@@ -148,6 +150,7 @@ class Bishop(Piece):
                     moves.append(move)
 
         return moves
+
 
 class Queen(Piece):
     def generate_moves(self, board, pos, isLight):
@@ -174,6 +177,7 @@ class Queen(Piece):
 
         return moves
 
+
 class King(Piece):
     def generate_moves(self, board, pos, isLight):
         """Generates all of the moves possible for the current piece given that it is a queen"""
@@ -192,6 +196,7 @@ class King(Piece):
                 moves.append(move)
 
         return moves
+
 
 class Pawn(Piece):
     en_passant: bool
