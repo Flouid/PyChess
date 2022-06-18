@@ -195,7 +195,7 @@ class ChessUI(QWidget):
     def draw_targets(self, painter):
         """Draw a distinctive highlight on every tile that the held piece can move to"""
         # lower the opacity since highlights should be subtle
-        painter.setOpacity(0.25)
+        painter.setOpacity(0.4)
 
         # if nothing is currently held, don't draw anything
         if self.pickup is None:

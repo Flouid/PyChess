@@ -88,8 +88,6 @@ class Rook(Piece):
                 target = Position(pos.r, pos.c - d)
                 march('W')
 
-        print(moves)
-
         return moves
 
 class Knight(Piece):
@@ -97,10 +95,22 @@ class Knight(Piece):
         """Generates all of the moves possible for the current piece given that it is a rook"""
         moves = []
 
-        def lance(target):
-            # if the target tile is empty or contains an enemy piece then it is a valid move
-            if board.board[target.r, target.c] is None or board.board[target.r, target.c].isLight != isLight:
-                moves.append(Move(pos, target))
+        def lance(r_offset, c_offset):
+            target = pos + Position(r_offset, c_offset)
+            # only proceed if the target is actually on the board
+            if target.is_on_board():
+                # if the target tile is empty or contains an enemy piece then it is a valid move
+                if board.board[target.r, target.c] is None or board.board[target.r, target.c].isLight != isLight:
+                    moves.append(Move(pos, target))
+
+        lance(-2, 1)    # 1 o'clock
+        lance(-1, 2)    # 2 o'clock
+        lance(1, 2)     # 4 o'clock
+        lance(2, 1)     # 5 o'clock    
+        lance(2, -1)    # 7 o'clock
+        lance(1, -2)    # 8 o'clock
+        lance(-1, -2)   # 10 o'clock
+        lance(-2, -1)   # 11 o'clock
 
         return moves
 
