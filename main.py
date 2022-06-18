@@ -231,7 +231,8 @@ class ChessUI(QWidget):
         return move in self.moves
 
     def account_for_pawns(self, move):
-        """Accounts for the intracacies of en passant and other pawn shenanigans"""
+        """Accounts for the intracacies of en passant and other pawn shenanigans.
+        Mutates the state data of the pieces involved in the move and deals with en passant"""
         begin, target = move.begin, move.target
         # if this is an en-passant capture, then delete the appropriate pawn
         if move.is_ep_cap:
