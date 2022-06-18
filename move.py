@@ -4,7 +4,8 @@ from position import Position
 
 @dataclass
 class Move:
-    """A class for representing a single move as a pair of positions"""
+    """A class for representing a single move as a pair of positions.
+    Tracks whether a move is an en passant capture for the rare case that matters"""
     begin: Position
     target: Position
     is_ep_cap: bool = False
