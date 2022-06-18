@@ -66,11 +66,18 @@ class Rook(Piece):
         min_cval = min(c_range)
         max_cval = min(c_range)
 
+        print(f'{min_rval=}, {max_rval=}, {min_cval=}, {max_cval=}')
+
         # find the limits of where the rook can travel along the rows
         dist = 1
         while True:
-            break
+            if dist <= min_rval:
+                pass
 
+            if dist <= min_cval:
+                pass
+
+            break
             
         # find the limits of where the rook can travel along the columns
         dist = 1
