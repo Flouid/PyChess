@@ -112,22 +112,16 @@ class Knight(Piece):
         """Generates all of the moves possible for the current piece given that it is a rook"""
         moves = []
 
-        def lance(r_offset, c_offset):
-            target = pos + Position(r_offset, c_offset)
-            # only proceed if the target is actually on the board
-            if target.is_on_board():
-                # if the target tile is empty or contains an enemy piece then it is a valid move
-                if board.board[target.r, target.c] is None or board.board[target.r, target.c].isLight != isLight:
-                    moves.append(Move(pos, target))
+        # offsets representing the eight places a knight can attack
+        offsets = [Position(-2, 1), Position(-1, 2), Position(1, 2), Position(2, 1), 
+                   Position(2, -1), Position(1, -2), Position(-1, -2), Position(-2, -1)]
 
-        lance(-2, 1)    # 1 o'clock
-        lance(-1, 2)    # 2 o'clock
-        lance(1, 2)     # 4 o'clock
-        lance(2, 1)     # 5 o'clock    
-        lance(2, -1)    # 7 o'clock
-        lance(1, -2)    # 8 o'clock
-        lance(-1, -2)   # 10 o'clock
-        lance(-2, -1)   # 11 o'clock
+        for offset in offsets:
+            # attempt to march by jumping to the offset
+            move = self.march(pos, offset, board)
+
+            if move is not None:
+                moves.append(move)
 
         return moves
 
@@ -135,29 +129,23 @@ class Bishop(Piece):
     def generate_moves(self, board, pos, isLight):
         """Generates all of the moves possible for the current piece given that it is a bishop"""
         moves = []
+
+        # named booleans for whether each direction is blocked and a list of names
         unblocked_directions = {'NE': True, 'SE': True, 'SW': True, 'NW': True}
+        directions = ['NE', 'SE', 'SW', 'NW']
 
-        def march(direction, r_offset, c_offset):
-            target = pos + Position(r_offset, c_offset)
-            # only proceed if the target is actually on the board and the direction is unblocked
-            if target.is_on_board() and unblocked_directions[direction]:
-                # if the tile is empty, add a move
-                if board.board[target.r, target.c] is None:
-                    moves.append(Move(pos, target))
-                # if the tile contains an enemy piece, add a move and mark the direction as blocked
-                elif target.contains_enemy_piece(board, isLight):
-                    moves.append(Move(pos, target))
-                    unblocked_directions[direction] = False
-                # if the tile contains an allied piece, mark the direction as blocked
-                elif target.contains_allied_piece(board, isLight):
-                    unblocked_directions[direction] = False
-
-        # try to march up to 7 tiles in each direction
+        # traverse the maximum range in each direction
         for d in range(1, 8):
-            march('NE', -d, d)   # northeast
-            march('SE', d, d)    # southeast
-            march('SW', d, -d)   # southwest
-            march('NW', -d, -d)  # northwest
+            # all of the posible offsets for a bishop
+            offsets = [Position(-d, d), Position(d, d), Position(d, -d), Position(-d, -d)]
+            # for each offset/direction, attempt to march d tiles and track if an obstruction is found
+            for i, offset in enumerate(offsets):
+                # attempt to march
+                unblocked_directions, move = self.march(pos, offset, board, directions[i], unblocked_directions)
+
+                # if a valid move was found then add it
+                if move is not None:
+                    moves.append(move)
 
         return moves
 
@@ -165,33 +153,24 @@ class Queen(Piece):
     def generate_moves(self, board, pos, isLight):
         """Generates all of the moves possible for the current piece given that it is a queen"""
         moves = []
+
+        # named booleans for whether each direction is blocked and a list of names
         unblocked_directions = {'N': True, 'NE': True, 'E': True, 'SE': True, 'S': True, 'SW': True, 'W': True, 'NW': True}
+        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
 
-        def march(direction, r_offset, c_offset):
-            target = pos + Position(r_offset, c_offset)
-            # only proceed if the target is actually on the board and the direction is unblocked
-            if target.is_on_board() and unblocked_directions[direction]:
-                # if the tile is empty, add a move
-                if board.board[target.r, target.c] is None:
-                    moves.append(Move(pos, target))
-                # if the tile contains an enemy piece, add a move and mark the direction as blocked
-                elif target.contains_enemy_piece(board, isLight):
-                    moves.append(Move(pos, target))
-                    unblocked_directions[direction] = False
-                # if the tile contains an allied piece, mark the direction as blocked
-                elif target.contains_allied_piece(board, isLight):
-                    unblocked_directions[direction] = False
-
-        # try to march up to 7 tiles in each direction
+        # traverse the maximum range in each direction
         for d in range(1, 8):
-            march('N', -d, 0)    # north
-            march('NE', -d, d)   # northeast
-            march('E', 0, d)     # east
-            march('SE', d, d)    # southeast
-            march('S', d, 0)     # south
-            march('SW', d, -d)   # southwest
-            march('W', 0, -d)    # west
-            march('NW', -d, -d)  # northwest
+            # all of the posible offsets for a queen
+            offsets = [Position(-d, 0), Position(-d, d), Position(0, d), Position(d, d), 
+                       Position(d, 0), Position(d, -d), Position(0, -d), Position(-d, -d)]
+            # for each offset/direction, attempt to march d tiles and track if an obstruction is found
+            for i, offset in enumerate(offsets):
+                # attempt to march
+                unblocked_directions, move = self.march(pos, offset, board, directions[i], unblocked_directions)
+
+                # if a valid move was found then add it
+                if move is not None:
+                    moves.append(move)
 
         return moves
 
@@ -199,32 +178,18 @@ class King(Piece):
     def generate_moves(self, board, pos, isLight):
         """Generates all of the moves possible for the current piece given that it is a queen"""
         moves = []
-        unblocked_directions = {'N': True, 'NE': True, 'E': True, 'SE': True, 'S': True, 'SW': True, 'W': True, 'NW': True}
 
-        def march(direction, r_offset, c_offset):
-            target = pos + Position(r_offset, c_offset)
-            # only proceed if the target is actually on the board and the direction is unblocked
-            if target.is_on_board() and unblocked_directions[direction]:
-                # if the tile is empty, add a move
-                if board.board[target.r, target.c] is None:
-                    moves.append(Move(pos, target))
-                # if the tile contains an enemy piece, add a move and mark the direction as blocked
-                elif target.contains_enemy_piece(board, isLight):
-                    moves.append(Move(pos, target))
-                    unblocked_directions[direction] = False
-                # if the tile contains an allied piece, mark the direction as blocked
-                elif target.contains_allied_piece(board, isLight):
-                    unblocked_directions[direction] = False
+        # all of the posible offsets for a king
+        offsets = [Position(-1, 0), Position(-1, 1), Position(0, 1), Position(1, 1), 
+                    Position(1, 0), Position(1, -1), Position(0, -1), Position(-1, -1)]
+        # for each offset/direction, attempt to march d tiles and track if an obstruction is found
+        for offset in offsets:
+            # attempt to march
+            move = self.march(pos, offset, board)
 
-        # try to march 1 tile in each direction
-        march('N', -1, 0)    # north
-        march('NE', -1, 1)   # northeast
-        march('E', 0, 1)     # east
-        march('SE', 1, 1)    # southeast
-        march('S', 1, 0)     # south
-        march('SW', 1, -1)   # southwest
-        march('W', 0, -1)    # west
-        march('NW', -1, -1)  # northwest
+            # if a valid move was found then add it
+            if move is not None:
+                moves.append(move)
 
         return moves
 
