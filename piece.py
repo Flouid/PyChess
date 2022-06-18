@@ -57,36 +57,27 @@ class Rook(Piece):
         moves = []
         unblocked_directions = {'N': True, 'E': True, 'S': True, 'W': True}
 
-        def march(direction):
-            # if the tile is empty, add a move
-            if board.board[target.r, target.c] is None:
-                moves.append(Move(pos, target))
-            # if the tile contains an enemy piece, add a move and mark the direction as blocked
-            elif target.contains_enemy_piece(board, isLight):
-                moves.append(Move(pos, target))
-                unblocked_directions[direction] = False
-            # if the tile contains an allied piece, mark the direction as blocked
-            elif target.contains_allied_piece(board, isLight):
-                unblocked_directions[direction] = False
+        def march(direction, r_offset, c_offset):
+            target = pos + Position(r_offset, c_offset)
+            # only proceed if the target is actually on the board and the direction is unblocked
+            if target.is_on_board() and unblocked_directions[direction]:
+                # if the tile is empty, add a move
+                if board.board[target.r, target.c] is None:
+                    moves.append(Move(pos, target))
+                # if the tile contains an enemy piece, add a move and mark the direction as blocked
+                elif target.contains_enemy_piece(board, isLight):
+                    moves.append(Move(pos, target))
+                    unblocked_directions[direction] = False
+                # if the tile contains an allied piece, mark the direction as blocked
+                elif target.contains_allied_piece(board, isLight):
+                    unblocked_directions[direction] = False
 
         # try to march up to 7 tiles in each direction
         for d in range(1, 8):
-            # march to the north
-            if pos.r - d >= 0 and unblocked_directions['N']:
-                target = Position(pos.r - d, pos.c)
-                march('N')
-            # march to the east
-            if pos.c + d < 8 and unblocked_directions['E']:
-                target = Position(pos.r, pos.c + d)
-                march('E')
-            # march to the south
-            if pos.r + d < 8 and unblocked_directions['S']:
-                target = Position(pos.r + d, pos.c)
-                march('S')
-            # march to the west
-            if pos.c - d >= 0 and unblocked_directions['W']:
-                target = Position(pos.r, pos.c - d)
-                march('W')
+            march('N', -d, 0)   # north
+            march('E', 0, d)    # east
+            march('S', d, 0)    # south
+            march('W', 0, -d)   # west
 
         return moves
 
