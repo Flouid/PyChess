@@ -107,7 +107,33 @@ class Knight(Piece):
 
 class Bishop(Piece):
     def generate_moves(self, board, pos, isLight):
-        return []
+        """Generates all of the moves possible for the current piece given that it is a rook"""
+        moves = []
+        unblocked_directions = {'NE': True, 'SE': True, 'SW': True, 'NW': True}
+
+        def march(direction, r_offset, c_offset):
+            target = pos + Position(r_offset, c_offset)
+            # only proceed if the target is actually on the board and the direction is unblocked
+            if target.is_on_board() and unblocked_directions[direction]:
+                # if the tile is empty, add a move
+                if board.board[target.r, target.c] is None:
+                    moves.append(Move(pos, target))
+                # if the tile contains an enemy piece, add a move and mark the direction as blocked
+                elif target.contains_enemy_piece(board, isLight):
+                    moves.append(Move(pos, target))
+                    unblocked_directions[direction] = False
+                # if the tile contains an allied piece, mark the direction as blocked
+                elif target.contains_allied_piece(board, isLight):
+                    unblocked_directions[direction] = False
+
+        # try to march up to 7 tiles in each direction
+        for d in range(1, 8):
+            march('NE', -d, d)   # north
+            march('SE', d, d)    # east
+            march('SW', d, -d)   # south
+            march('NW', -d, -d)  # west
+
+        return moves
 
 class Queen(Piece):
     def generate_moves(self, board, pos, isLight):
